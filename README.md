@@ -1,4 +1,0 @@
-LBM
-===
-
-Lattice Boltzmann codes
