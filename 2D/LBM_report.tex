@@ -1,0 +1,205 @@
+\documentclass[titlepage,a4paper,10pt]{article}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{bibtopic}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{marvosym}
+\title{\textbf{Lattice Boltzmann Methods for blood flow}\\ Summer Research Fellowship Program:Report\\Jawaharlal Nehru Centre for Advanced Scientific Research, JNCASR}
+\author{Shashank Subramanian\\ (Under the guidance of Prof.Santhosh Ansumali,JNCASR)}
+\date{Indian Institute of Technology Madras}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+The basic equation of fluid dynamics describing evolution of density $\rho$ and velocity $u_i$ is
+\begin{equation} 
+\begin{aligned}
+\partial_t \rho + \bigtriangledown(\rho u_i) &= 0 \\
+\partial_tu_i + u_k\bigtriangledown_k(u_i) &= -\frac{1}{\rho}(\bigtriangledown_ip - \bigtriangledown_j\sigma_{ij}) \\
+\partial_tE + \bigtriangledown_k(\frac{\rho u^2u_k}{2} + \frac{D+2}{2}\rho u_k) &= -\bigtriangledown_k(\sigma_{ik}u_i + q_k) 
+\end{aligned}
+\end{equation}
+Here, $i$ denotes the space index, $p$ the local pressure, $\sigma$ is the viscous stress tensor, $D$ is the number of dimensions of the system and $q_k$ is the heat flux.
+In Newtonian fluid mechanics, $\sigma_{ij}$ is taken as $\nu(\partial_iu_j + \partial_ju_i)$. $\nu$ is the dynamic viscosity of the fluid.
+In the incompressible limit,
+\begin{equation} 
+\begin{aligned}
+\bigtriangledown.u &= 0 \\
+\partial_t(u_i) + u_k\bigtriangledown_k(u_i) &= -\frac{1}{\rho}\bigtriangledown_ip - \nu\bigtriangledown^2u_i
+\end{aligned}
+\end{equation}
+By taking the divergence of the velocity equation, we can see that the pressure satisfies the Poisson equation
+\begin{equation}
+\bigtriangledown^2p = -\bigtriangledown_i\bigtriangledown_j(u_iu_j) 
+\end{equation}
+There are many possible ways discretize these equations based on finite difference and finite volume methods. Most of these formulations spend a considerable amount of time in solving pressure poisson equation. Furthermore, the non-linear term representing fluid convection requires careful treatment.
+The Lattice Boltzmann method is an alternative to this, involving the discretization of probability distributions (which hold
+information on the probability of finding a particle with a given velocity at a given space location) advecting across 
+the lattice and conserving mass amd momentum locally. This method has the advantage that the advection is linear and the pressure poisson solver is not needed.
+
+The aim of the project is to simulate the flow through a respiratory system. This paper discusses certain 2D simulations performed to analyze the effectiveness of the Lattice Boltzmann method and the theory behind them.
+\section{Boltzmann equation}
+The Boltzmann equation describes the evolution equation for distribution function. The distribution function,$f \equiv f(\bf x,\bf v, t)$, denotes the probability of finding a partice with velocity $\bf v$ at a spatial location $\bf x$ at a time $t$. The macroscopic variables are the lower order moments of $f$ and are given as
+\begin{equation}
+\begin{aligned}
+\rho = <f,1> , \rho u_\alpha = <f,\textbf{v}>, \rho u^2 + 3p = <f, \bf v^2>
+\end{aligned}
+\end{equation}
+Where, inner product $<\phi,\psi>$ is defined as
+\[ <\phi,\psi> = \int f\phi\psi d\bf v \]
+The evolution equation for the particle distribution function, $f$ in case of dilute gases is governed by the Boltzmann equation
+\begin{equation}
+ \frac{\partial f}{\partial t}+v_{\alpha}\frac{\partial f}{\partial x_{\alpha}}+
+ g_{\alpha} \frac{\partial f}{\partial v_{\alpha}}
+ = \Omega(f).
+ \end{equation}
+where, $\Omega$ is the collision integral which ensures that the system moves towards a local equilibrium.
+\\
+
+The dynamics of $f$ is such that 
+\begin{equation} \partial_tH + \partial_{\alpha}J_{H\alpha} = \sigma\le0 \end{equation}
+where, 
+\[ H = \int f(lnf - 1) \]
+\[ J_{H\alpha} = \int f\textbf{v} lnfd\bf v \]
+and $\sigma$ physically represents the negative of entropy production and is $0$ if and only if $f$ is the same as the Maxwell-Boltzmann distribution:
+\begin{equation}
+   f^{\rm MB}(v_x, v_y,v_z) = n\,\left(\frac{m}{2 \pi k_B \,T } \right)^{3/2} \exp{\left(-\frac{m}{2\, k_B T} (v-u)^2 \right)},
+\end{equation}
+The Maxwell-Boltzmann distribution minimizes 
+\[ \Phi = H + \int(\alpha f + \beta \textbf{v}f + \gamma \textbf{v}^2 f)d\textbf{v}) \]
+where $\alpha$, $\beta$ and $\gamma$ are the lagrange multipliers. This implies that $f^{eq}$ is the minimum of the $H$ functional under constraints of mass, momentum and energy conservation. Solving this minimization problem, one obtains the Maxwell-Boltzmann distribution.
+%\begin{equation}
+% f^{\rm eq} = \exp{\left(-\left(\alpha+\beta_{\theta} v_{\theta} +\gamma v^2\right)\right)}
+% \end{equation}
+\subsection{Bhatnagar-Gross-Krook (BGK) model}
+The evolution equation for the discrete populations is 
+\begin{equation} \partial_tf_i + c_{i\alpha}f_i = \Omega_i(f) \end{equation}
+where, $\Omega$ is the collision integral.In the BGK model, the collision term is modelled as a single relaxation time one. That is,
+\begin{equation} \Omega(f) = \frac{1}{\tau}[f_{eq} - f] \end{equation}
+Where, $\tau$ is the smallest time scale of relaxation and is related with the fluid viscosity as 
+\begin{equation} \nu = c^2\tau \end{equation}
+Thus, the evolution equation reduces to  
+\begin{equation} \partial_tf_i + c_{i\alpha}f_i = \frac{1}{\tau}(f_{eq}_i - f_i)\end{equation}
+%Perturbation analysis of the formal expression of $f_{eq}$ described in the preceeding sections gives us the
+%perturbative equilibrium expression up to $O(u^2)$ as
+%\begin{equation} f_i^{eq} = \rho W_i\left[1 + \frac{u_{\alpha} c_{i\alpha}}{\theta_0} + \frac{u_{\alpha}u_{\beta}}{2\theta_0^2}(c_{i\alpha}c_{i\beta} - \theta_0\delta_{\alpha\beta})\right]  \end{equation}
+
+\section{Lattice Boltzmann method formulation}
+In this method, we work with a set of discrete populations $f_i \equiv f(\textbf{x},\textbf{c}_i,t)$, where discrete velocities $\textbf{c}_i$ were chosen from a set of pre-defined discrete velocities $(i = 1,\hdots, N)$. Similar to the continuous case, the conserved variables are the lower order moments of the distribution function. However, the meaning of the $<>$ operator reduces to a simple summation
+\[ <\phi(c_i),\psi(c_i)> = \sum_{i=1}^N\phi_i\psi_i\]
+\\
+The collision integral, $\Omega$ is often modeled in the BGK form with choice of equilibrium distribution as 
+\begin{equation} f_i^{eq} = \rho W_i\left[1 + \frac{u_{\alpha} c_{i\alpha}}{\theta_0} + \frac{u_{\alpha}u_{\beta}}{2\theta_0^2}(c_{i\alpha}c_{i\beta} - \theta_0\delta_{\alpha\beta})\right] \end{equation}
+This choice of equilibrium function is such that it minimizes the discrete H function, $H = \sum_{i=1}^N f_i(\frac{lnf_i}{W_i} - 1) $, to the order of $u^2$.
+
+The common choice for discrete velocities for a 2D simulation is shown in Fig.1
+\begin{figure}[H]
+\centering
+\includegraphics[width=50mm]{lattice.jpeg}
+\caption{D2Q9 lattice structure\cite{1}}
+\label{overflow}
+\end{figure}
+The stencil and the corresponding weights associated with each direction are
+\begin{equation}
+\begin{aligned}
+c_{ix} &= c\left[0,1,0,-1,0,1,1,-1,-1\right] \\
+c_{iy} &= c\left[0,0,1,0,-1,1,-1,1,-1\right] \\
+W_i &= \left[\frac{4}{9},\frac{1}{9},\frac{1}{9},\frac{1}{9},\frac{1}{9},\frac{1}{36},\frac{1}{36},\frac{1}{36},\frac{1}{36}\right] 
+\end{aligned}
+\end{equation}
+where, $c$ is the lattice speed of sound and is related to the reference temperature $\theta_0$ as $\sqrt{3\theta_0}$. It is convenient to take $c$ as 1 in numerical simulations which makes $\theta_0$ equal to $\frac{1}{3}$.
+
+The implicit discretization of the evolution equation to the order $O(\Delta t^2)$ can be shown to be
+\[ f(x+c_i\Delta t,t+\Delta t) - f(x,t) = \frac{\Delta t}{2\tau}(\Omega(f') + \Omega(f) \]
+where the superscript denotes the distribution function at the position $x+c_i\Delta t$ and time $t+\Delta t$.
+In order to convert it to an explicit one, we make the following substitution
+\[ g_i = f_i - \frac{1}{2\tau}(f^{eq} - f) \]
+Using this, the evolution equation is transformed to
+\begin{equation}
+ g(x',t') - g(x,t) = \frac{2\Delta t}{2\tau + \Delta t}(\Omega(g))
+\end{equation}
+This equation can be implemented in two steps as
+\[ g(x',t) = g(x,t*)\]
+\[ g(x,t*) = g(x,t) + 2\beta(g^{eq} - g) \]
+where, $\beta$ is $\frac{2\Delta t}{2\tau + \Delta t}$ and $*$ denotes the distributions after collision.
+Thus, the algorithm is comprised of three steps:
+\begin{itemize}
+\item Collide
+\item Stream
+\item Apply Boundary conditions
+\end{itemize}
+The collision step involves making the discrete distributions as close to the local equilibrium as possible. Streaming is just the 
+advection of the discrete populations in their respective directions. Application of boundary conditions is to account for external boundaries like walls and internal ones like an object in the flow. In LBM, these conditions boil down to very simple relations as explained below
+\begin{enumerate}
+\item \textbf{No-slip Boundary condition:} The no slip boundary condition at the walls is modeled by simply reversing the direction of the velocity hitting the boundary. This condition is known as the \textbf{bounce-back} boundary condition. 
+%\item \textbf{Internal boundary condition:} Bounce-back on those directions which encounter an internal boundary summarizes this boundary behaviour
+\item \textbf{Inlet and Outlet:} To simulate inlet conditions, the inlet grid points are initialized with the equilibrium distribution calculated with the inlet velocity. At the outlet, a similar procedure is followed keeping in mind the continuity of the flow.
+\end{enumerate}
+
+\subsection{Staggered grid}
+In order to increase the accuracy of the method, a staggered grid formation with known performance imporvement is discussed below. 
+A new(replica) grid is made by displacing the original grid by half the grid size in both $x$ and $y$ directions. The variables are defined on both the grids and the collisions and advections are carried out on them simulataneously. The stencil for the staggered grid is same as the normal grid except for the fact that the diagonals move through half the distance. That is
+\begin{equation}
+\begin{aligned}
+c_{ix} &= c\left[0,1,0,-1,0,1/2,1/2,-1/2,-1/2\right] \\
+c_{iy} &= c\left[0,0,1,0,-1,1/2,-1/2,1/2,-1/2\right] \\
+W_i &= \left[\frac{4}{9},\frac{1}{36},\frac{1}{36},\frac{1}{36},\frac{1}{36},\frac{1}{9},\frac{1}{9},\frac{1}{9},\frac{1}{9}\right]
+\end{aligned} 
+\end{equation}
+
+
+As with the simple grid, it is possible to get the equilibrium distributions for the staggered grid too. The only change is that the value of $\theta_0$ changes to $\frac{1}{6}$.
+
+\section{Benchmark simulations}
+This section describes some 2D simulations to test the validity of the method.
+\subsection{Poisuelle flow}
+As a first test, we study the Hagen-Poisuelle flow, where the flow between two parallel plates is driven by a constant pressure gradient. In this problem, a pressure gradient giving a centerline velocity of 0.04 is applied. The expected velocity profile is
+\begin{figure}[H]
+\centering
+\includegraphics[width=100mm]{poi1.jpg}
+\caption{Parabolic profile of the Poisuelle flow}
+\label{overflow}
+\end{figure}
+Now, we contrast the numerical results with the analytical one.
+\begin{figure}[H]
+\centering
+\includegraphics[width=100mm]{poi.jpg}
+\caption{Comparing the Analytical solution with the numerical solution of Poisuelle flow}
+\label{overflow}
+\end{figure}
+\subsection{Lid-driven cavity flow}
+LBM is applied to the lid-driven cavity flow which involves the movement of the top wall in a square boundary.
+The top wall is moved with a velocity 0.04 units. The resulting streamlines are shown. The grid is a square $100\times100$
+\begin{figure}[H]
+\centering
+\includegraphics[width=100mm]{CavityRe101.png}
+\caption{Streamlines in a cavity flow}
+\label{overflow}
+\end{figure}
+
+\subsection{Cylinder in a channel flow}
+The streamlines are shown for a cylinder kept in a pipe with an inlet and outlet. For the internal boundary, bounce-back conditions for those discrete directions encountering the boundary are applied. The grid is a rectangle $300\times50$
+\begin{figure}[H]
+\centering
+\includegraphics[width=120mm]{CylinReplicaRe10.png}
+\caption{Streamlines around a cylinder}
+\label{overflow}
+\end{figure}
+At high Reynolds number (in the below case, 200), we can see the vortex shedding moving into the flow.
+\begin{figure}[H]
+\centering
+\includegraphics[width=120mm]{Cylin50.png}
+\caption{Vortex shedding around a cylinder at higher Reynolds number}
+\label{overflow}
+\end{figure}
+
+\section{Summary and Outlook}
+In this report, we have presented the basic outline of the Lattice Boltzmann method and checked its results with simple 2D systems - Channel flow (Hagen-Poisuelle flow), Lid-driven cavity flow and a cylinder kept in a channel flow. The Lattice-Boltzmann method can now be extended to the three dimensional case to test for biological systems like the respiratory and circulatory system. They are essentially channel flows with complex geometeries.
+
+\begin{thebibliography}{10}
+\bibitem{1} Google images
+\bibitem{2} S.Ansumali, I.V.Karlin, and H.C.Ottinger. Minimal entropic kinetic models for simulating hydrodynamics. \textit{Europhys. Lett},63:798-804,2003
+\end{thebibliography}
+
+\end{document}
