@@ -31,8 +31,9 @@
 #ifndef _GRID_V_H_
 #define _GRID_V_H_
 #include<iostream>
+using namespace std;
  
-typedef  double myReal;
+typedef  long double myReal;
 template<int N>
 class gridV{
 public:
@@ -46,8 +47,8 @@ gridV(int _n1, int _n2, int _numPad1, int _numPad2){
 	m1= _n1+2*_numPad1;
 	m2 = _n2+2*_numPad2;
 	m3=  1;
-	iB1 = _numPad1 - 1;
-	iB2 = _numPad2 - 1;
+	iB1 = _numPad1;
+	iB2 = _numPad2;
 	iB3 = 1;
 	iE1= _n1+_numPad1-1;
 	iE2 = _n2+_numPad2-1;
@@ -65,33 +66,33 @@ gridV(int _n1, int _n2,int _n3, int _numPad1, int _numPad2, int _numPad3){
 	m1= _n1+2*_numPad1;
 	m2 = _n2+2*_numPad2;
 	m3 = _n3+2*_numPad3;
-	m3=  _n3+2*_numPad3;
-	iB1 = _numPad1 - 1;
-	iB2 = _numPad2 - 1;
-	iB3 = _numPad3 - 1;
+	
+	iB1 = _numPad1;
+	iB2 = _numPad2;
+	iB3 = _numPad3;
 	iE1= _n1+_numPad1-1;
 	iE2 = _n2+_numPad2-1;
-	iE3=   _n3+_numPad3-1;
+	iE3 = _n3+_numPad3-1;
 	size = m1*m2*m3;
 	data = new myReal[size*N];
 }
 
- myReal operator() (int i, int j, int k,int dv) const
+myReal operator() (int i, int j, int k,int dv) const
 {
-return data[k*m1*m2+j*m1*N+i*N+dv];
+return data[k*m1*m2*N+j*m1*N+i*N+dv];
 }
 myReal& operator() (int i, int j, int k,int dv)  
 {
-return data[k*m1*m2+j*m1*N+i*N+dv];
+return data[k*m1*m2*N+j*m1*N+i*N+dv];
 }
 //Use as 2D array;
  myReal operator() (int i, int j, int dv) const
 {
-return data[ j*m1*N+i*N+dv];
+return data[j*m1*N+i*N+dv];
 }
 myReal& operator() (int i, int j, int dv)  
 {
-return data[ j*m1*N+i*N+dv];
+return data[j*m1*N+i*N+dv];
 }
 //use as 1D Array
 myReal operator[] (int i) const
@@ -216,7 +217,7 @@ void printNode(gridV<N> node,std::ostream &file1) {
 		}
 		file1 << std::endl;
 	}
-}
+} 									
 
 
 #endif
