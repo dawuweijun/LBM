@@ -14,8 +14,9 @@ using namespace std;
 
 int main() {
 
-	ofstream file;
+	ofstream file,file2;
 	file.open("Energy.txt");
+	file2.open("Force.txt");
 	int c = 0;
 
 
@@ -25,25 +26,34 @@ int main() {
 	gridtype cellType(NX,NY,NZ,NX_G,NY_G,NZ_G);
 
 	initializeWithZeroVel(node,cell);
-
+	//setTypeSphere(nodeType,cellType);
+	setTypeWall(nodeType, cellType);
+	//cout<<beta<<endl;
 	for (int t = 0; t < SIMULATION_TIME; t++) {
 //		cout<<"After periodic-----";
 //		printGlobalRho(node,cell);
 		collide(node);
 		collide(cell);
-		periodic123(node);
-		periodic123(cell);
+
+		setInletOutlet(node,cell);
+		periodic23(node);
+		periodic23(cell);
+		
 		stream(node,cell);
-//		if (t%100 == 0) {
-//			printGlobalRho(node,cell);
-//		}
-		//setInternalBoundary(node,cell,nodeType,cellType);
+		setInletOutletCorrection(node,cell);
+		setInternalBoundary(node,cell,nodeType,cellType);
+		if (t%100 == 0) {
+			printGlobalRho(node,cell,nodeType,cellType,file);
+			file2<<forceX/(u_inlet*u_inlet*radius*radius*3.14*0.5)<<endl;		
+		}
 		//printEachTime(node,t,c);
-		//if(t%30==0) printEnergy(node,file);
+		//printVelX(node,nodeType,t,c);
+		if(t%100==0) printAllVel(node,nodeType);// printEnergy(node,file);
 		//cout<<t<<endl;
 	}
-	printAllVel(node);
+	//printAllVel(node,nodeType);
 	file.close();
+	file2.close();
 
 }
 		
