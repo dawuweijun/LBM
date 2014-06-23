@@ -46,27 +46,22 @@ template<int N>
 void periodicNode1(gridV<N> &node){
   // Now set periodic in   Left end of 1
 	for (int i3 = 0; i3 < node.m3; i3++) {
-		for (int  i2=0; i2< node.m2;  i2++)
-		{
-			 // for(int i1BDummy=0; i1BDummy<node.nB1; i1BDummy++)
-			for(int k=0;k<N;k++) {
-//				node(i1BDummy,i2,i3,k) = node(node.iE1+i1BDummy,i2,i3,k); 
-				node(0,i2,i3,k) = node(node.iE1,i2,i3,k);
-//				if(node(node.iE1,i2,i3,k)==0&&k!=N-1)cout<<"SOMTHING WRONG IN P1 at "<<k<<" Dist at i2,i3 = "<<i2<<","<<i3<<endl;
-				}
+		for (int  i2=0; i2< node.m2;  i2++) {
+			for(int i1BDummy=0; i1BDummy<node.nB1; i1BDummy++)
+				for(int k=0;k<N;k++) 
+					node(i1BDummy,i2,i3,k) = node(node.iE1+i1BDummy,i2,i3,k); 
+//					node(0,i2,i3,k) = node(node.iE1,i2,i3,k);					
 		}
 	}
 //Right end of 1
 	for (int i3 = 0; i3 < node.m3; i3++) {
-		for (int  i2=0; i2<node.m2;  i2++)
-		{
-			 //int left= node.iB1;
-			 // for(int i1EDummy=node.iE1+1; i1EDummy<node.m1; i1EDummy++,left++){
-			for(int k=0;k<N;k++) {
-//					node(i1EDummy,i2,i3,k)  = node(left,i2,i3,k); 
-				node(node.iE1+1,i2,i3,k)  = node(node.iB1,i2,i3,k); 
-				//	if(node(node.iB1,i2,i3,k)==0 && k!=N-1) cout<<"SOMTHING WRONG IN P1 second loop "<< k<<" Dist at i2,i3 = "<<i2<<","<<i3 << endl;
-				}
+		for (int  i2=0; i2<node.m2;  i2++) {
+			int left= node.iB1;
+			for(int i1EDummy=node.iE1+1; i1EDummy<node.m1; i1EDummy++,left++)
+				for(int k=0;k<N;k++) 
+					node(i1EDummy,i2,i3,k)  = node(left,i2,i3,k); 
+//					node(node.iE1+1,i2,i3,k)  = node(node.iB1,i2,i3,k); 
+				
 			  
 		}
 	}
@@ -74,27 +69,21 @@ void periodicNode1(gridV<N> &node){
 }
 template<int N>
 void periodicNode2(gridV<N> &node){
-	for (int i3 = 0; i3 < node.m3; i3++) {;
-		for (int  i1=0; i1< node.m1;  i1++)
-		{
-//			  for(int i2BDummy=0; i2BDummy<node.nB2; i2BDummy++)
-			for(int k=0;k<N;k++) {
-//				node(i1,i2BDummy,i3,k)  = node(i1,node.iE2+i2BDummy,i3,k);
-				node(i1,0,i3,k)  = node(i1,node.iE2,i3,k); 
-				//if (node(16,13,14,1)==0)cout<<"WHAT?!!"<<i3<<endl;
-				}
-
+	for (int i3 = 0; i3 < node.m3; i3++) {
+		for (int  i1=0; i1< node.m1;  i1++) {
+			for(int i2BDummy=0; i2BDummy<node.nB2; i2BDummy++)
+				for(int k=0;k<N;k++) 
+					node(i1,i2BDummy,i3,k)  = node(i1,node.iE2+i2BDummy,i3,k);
+//					node(i1,0,i3,k)  = node(i1,node.iE2,i3,k);  //Debug
 		}
 	}
 	for (int i3 = 0; i3 < node.m3; i3++) {
-		for (int  i1=0; i1<node.m1;  i1++)
-		{
-			 int left= node.iB2;
-//			  for(int i2EDummy=node.iE2+1; i2EDummy<node.m2; i2EDummy++,left++){
-			  	for(int k=0;k<N;k++) 
-//					node(i1,i2EDummy,i3,k)  = node(i1,left,i3,k); 
-					node(i1,node.iE2+1,i3,k)  = node(i1,1,i3,k);
-//			  }
+		for (int  i1=0; i1<node.m1;  i1++) {
+			int left= node.iB2;
+			for(int i2EDummy=node.iE2+1; i2EDummy<node.m2; i2EDummy++,left++)
+				for(int k=0;k<N;k++) 
+					node(i1,i2EDummy,i3,k)  = node(i1,left,i3,k); 
+//					node(i1,node.iE2+1,i3,k)  = node(i1,1,i3,k);
 		}
 	}
 
@@ -104,25 +93,22 @@ void periodicNode2(gridV<N> &node){
 template<int N>
 void periodicNode3(gridV<N> &node){
 	for (int i1 = 0; i1 < node.m1; i1++) {
-		for (int  i2=0; i2< node.m2;  i2++)
-		{
-//			  for(int i3BDummy=0; i3BDummy<node.nB3; i3BDummy++)
-			    for(int k=0;k<N;k++) 
-//				node(i1,i2,i3BDummy,k)  = node(i1,i2,node.iE3+i3BDummy,k); 
-				node(i1,i2,0,k)  = node(i1,i2,node.iE3,k);
+		for (int  i2=0; i2< node.m2;  i2++) {
+			for(int i3BDummy=0; i3BDummy<node.nB3; i3BDummy++)
+				for(int k=0;k<N;k++) 
+					node(i1,i2,i3BDummy,k)  = node(i1,i2,node.iE3+i3BDummy,k); 
+//					node(i1,i2,0,k)  = node(i1,i2,node.iE3,k);
 		}
 	}
 
 	for (int i1 = 0; i1 < node.m1; i1++) {
-		for (int  i2=0; i2< node.m2;  i2++)
-		{
-			 int left= node.iB3;
-//			  for(int i3EDummy=node.iE3+1; i3EDummy<node.m3; i3EDummy++,left++){
-			  	for(int k=0;k<N;k++) {
-//					node(i1,i2,i3EDummy,k)  = node(i1,i2,left,k); 
-					node(i1,i2,node.iE3+1,k)  = node(i1,i2,1,k);
-//					if(node(i1,i2,1,k)==0) cout<<"SOMTHING WRONG IN P3 second loop "<< i1<<" "<<i2<< endl;
-			  }
+		for (int  i2=0; i2< node.m2;  i2++) {
+			int left= node.iB3;
+			for(int i3EDummy=node.iE3+1; i3EDummy<node.m3; i3EDummy++,left++)
+			  	for(int k=0;k<N;k++) 
+					node(i1,i2,i3EDummy,k)  = node(i1,i2,left,k); 
+//					node(i1,i2,node.iE3+1,k)  = node(i1,i2,1,k);
+			  
 		}
 	}
  

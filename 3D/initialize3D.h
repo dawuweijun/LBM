@@ -1,6 +1,7 @@
 #ifndef _INIT_3D_H
 #define _INIT_3D_H
 #include <iostream>
+#include<cstdlib>
 #include <math.h>
 #include "gridV.h"
 #include "globals3D.h"

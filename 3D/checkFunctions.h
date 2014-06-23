@@ -30,7 +30,7 @@ void checkInit(lbgrid &node) {
 	}
 }
 
-void printGlobalRho(lbgrid &node, lbgrid &cell) {
+void printGlobalRho(lbgrid &node, lbgrid &cell, gridtype nodeType, gridtype cellType, std::ofstream &file) {
 	myReal temp[27], checkf[27], rho, ux, uy, uz, theta, R, global_rho, global_rho1;
 	global_rho = 0;
 	global_rho1 = 0;
@@ -42,6 +42,7 @@ void printGlobalRho(lbgrid &node, lbgrid &cell) {
 				getMoments(temp,rho,ux,uy,uz,theta,R);
 				for (int k = 0; k < 27; k++)
 					checkf[k] += temp[k];
+
 				global_rho += rho;
 				global_rho1 += rho*(ux*ux + uy*uy + uz*uz+3.0*theta);
 			}
@@ -61,7 +62,8 @@ void printGlobalRho(lbgrid &node, lbgrid &cell) {
 	}
 	//for (int k = 0; k < 27; k++) 
 		//cout<<checkf[k]/(2*NX*NY*NZ)<<endl;
-	cout<<global_rho/(2*NX*NY*NZ)<<endl;       //<<" ;GLOBAL THETA:"<<global_rho1/(2*NX*NY*NZ)<<endl;
+	cout<<global_rho/(2*NX*NY*NZ)<<endl;// <<" ;GLOBAL THETA:"<<global_rho1/(2*NX*NY*NZ)<<endl;
+	file<<global_rho/(2*NX*NY*NZ)<<endl;
 	//cout<<"ITERATION OVER"<<endl;
 }
 
@@ -80,7 +82,7 @@ void printEnergy(lbgrid &node, std::ofstream &file) {
 	file<<E<<endl;
 }
 
-void printAllVel(lbgrid &node) {
+void printAllVel(lbgrid &node, gridtype nodeType) {
 	myReal temp[27], rho, ux, uy, uz, theta, R;
 	ofstream file;
 	file.open("AllVelocities3D.vtk");
@@ -89,7 +91,8 @@ void printAllVel(lbgrid &node) {
 			for (int i1 = node.SCM.iB1; i1 <= node.SCM.iE1; i1++) {
 				copyFromGrid(i1,i2,i3,node,temp);
 				getMoments(temp,rho,ux,uy,uz,theta,R);
-				file<<ux-g_x/2<<" "<<uy<<" "<<uz;
+				if (nodeType(i1,i2,i3) == SOLID) file<<0.0<<" "<<0.0<<" "<<0.0;
+				else file<<ux-g_x/2<<" "<<uy<<" "<<uz;
 				file<<endl;
 			}
 		}
@@ -98,7 +101,7 @@ void printAllVel(lbgrid &node) {
 }
 
 void printEachTime(lbgrid &node, int t, int &c) {
-	if (t%100 == 0){ 
+	if (t%500 == 0){ 
 		myReal temp[27], rho, ux, uy, uz, theta, R;
 		ofstream file;
 		char name[20];
@@ -109,11 +112,34 @@ void printEachTime(lbgrid &node, int t, int &c) {
 				for (int i1 = node.SCM.iB1; i1 <= node.SCM.iE1; i1++) {
 					copyFromGrid(i1,i2,i3,node,temp);
 					getMoments(temp,rho,ux,uy,uz,theta,R);
-					file<<ux<<" "<<uy<<" "<<uz;
-					file<<endl;
+//					file<<ux<<" "<<uy<<" "<<uz;
+//					file<<endl;
+					file<<rho<<endl;
 				}
 			}
 		}
+		file.close();
+	}
+}
+
+void printVelX(lbgrid &node, gridtype nodeType, int t, int &c) {
+	if (t%1000 == 0){ 
+		myReal temp[27], rho, ux, uy, uz, theta, R;
+		ofstream file;
+		char name[20];
+		sprintf(name,"CHeckVelocity%d.txt",++c);
+		file.open(name);
+//		for (int i3 = node.SCM.iB3; i3 <= node.SCM.iE3; i3++) {
+			for (int i2 = node.SCM.iB2; i2 <= node.SCM.iE2; i2++) {
+//				for (int i1 = node.SCM.iB1; i1 <= node.SCM.iE1; i1++) {
+
+					copyFromGrid(NX/2,i2,NZ/2,node,temp);
+					getMoments(temp,rho,ux,uy,uz,theta,R);
+					if (nodeType(NX/2,i2,NZ/2) == SOLID) ux = 0;
+					file<<ux<<endl;
+				}
+//			}
+//		}
 		file.close();
 	}
 }

@@ -1,14 +1,14 @@
 #ifndef _GLOBALS_3D_H
 #define _GLOBALS_3D_H
 const int N = 4;
-const int NX = 16;
+const int NX = 50;
 const int NY = 16;
-const int NZ = 16;
+const int NZ = 10;
 const int NX_G = 1;  //Number of ghost nodes in any direction
 const int NY_G = 1;
 const int NZ_G = 1;
 
-const int SIMULATION_TIME = 15000;
+const int SIMULATION_TIME = 20000;
 
 
 struct lbgrid {
@@ -82,21 +82,22 @@ myReal w[27] = {1.0/3.0,1.0/30.0,1.0/30.0,1.0/30.0,1.0/30.0,1.0/30.0,1.0/30.0,1.
 //myReal c_z[27] = {0,0,0,1,0,0,-1,0,0,0,0,1,-1,1,-1,1,1,-1,-1,1,1,1,1,-1,-1,-1,-1};
 
 
-double radius = 4.5;
+double radius = 2.5;
 int center_x = NX/2;
 int center_y = NY/2;
 int center_z = NZ/2;
 
 double u_inlet = 0.04;
 double Re = 10.0;
-double nu = u_inlet*NY/(Re);
-double g_x = (4.0*u_inlet*u_inlet)/(Re*NY);
+double nu = u_inlet*(2*radius)/(Re);
+double g_x = 0.0;//(4.0*u_inlet*u_inlet)/(Re*NY);
 double theta_0 = 1.0/5.0;
 
 double tau = nu/theta_0;
 double dt = 1;//6.28/NX;
 double beta = dt/(2*tau + dt);
 
+myReal forceX = 0.0;
 
 void swap(int &a, int &b) {
 	int temp;
@@ -109,6 +110,10 @@ void swap(myReal &a, myReal &b) {
 	temp = a;
 	a = b;
 	b = temp;
+}
+
+myReal avg(myReal a, myReal b) {
+	return ((a+b)/2.0);
 }
 
 enum DIST { 
