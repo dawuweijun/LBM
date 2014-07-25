@@ -33,7 +33,7 @@
 #include<iostream>
 using namespace std;
  
-typedef  long double myReal;
+typedef double myReal;
 template<int N>
 class gridV{
 public:
@@ -62,7 +62,7 @@ gridV(int _n1, int _n2,int _n3, int _numPad1, int _numPad2, int _numPad3){
 	n3= _n3;
 	nB1= _numPad1;
 	nB2= _numPad2;
-	nB3= _numPad3;
+	nB3= _numPad3;		
 	m1= _n1+2*_numPad1;
 	m2 = _n2+2*_numPad2;
 	m3 = _n3+2*_numPad3;
@@ -77,9 +77,8 @@ gridV(int _n1, int _n2,int _n3, int _numPad1, int _numPad2, int _numPad3){
 	data = new myReal[size*N];
 }
 
-myReal operator() (int i, int j, int k,int dv) const
-{
-return data[k*m1*m2*N+j*m1*N+i*N+dv];
+myReal operator() (int i, int j, int k,int dv) const {
+	return data[k*m1*m2*N+j*m1*N+i*N+dv];
 }
 myReal& operator() (int i, int j, int k,int dv)  
 {
@@ -131,7 +130,60 @@ int size;
 myReal *data; 
 };
 
- 
+//Class to hold node type and cell type
+class gridtype {
+	public:
+		gridtype(int _n1, int _n2,int _n3, int _numPad1, int _numPad2, int _numPad3) {
+			m1= _n1+2*_numPad1;
+			m2 = _n2+2*_numPad2;
+			m3 = _n3+2*_numPad3;
+			nB1= _numPad1;
+			nB2= _numPad2;
+			nB3= _numPad3;
+			iB1 = _numPad1;
+			iB2 = _numPad2;
+			iB3 = _numPad3;
+			iE1= _n1+_numPad1-1;
+			iE2 = _n2+_numPad2-1;
+			iE3 = _n3+_numPad3-1;
+			size = m1*m2*m3;
+			data = new int[size];
+ 			for (int i = 0; i < size; i++) data[i] = 1;
+		}
+		int n1,n2,n3,m1,m2,m3,size;
+		int iE1,iE2,iE3,iB1,iB2,iB3;
+		int nB1,nB2,nB3;
+		int *data;
+		//Overload the () operator
+		int operator() (int i, int j, int k) const {
+			return data[k*m1*m2 + j*m1 + i];
+		}
+		int& operator() (int i, int j, int k) {
+			return data[k*m1*m2 + j*m1 + i];
+		}
+};
+
+//				
+class arrayRT {	
+//				
+	public:
+		arrayRT(int _n1, int _n2,int _n3,int _numPad1, int _numPad2, int _numPad3) {
+			m1= _n1+2*_numPad1;
+			m2 = _n2+2*_numPad2;
+			m3 = _n3+2*_numPad3;
+			size = m1*m2*m3;
+			data = new myReal[size];
+ 			for (int i = 0; i < size; i++) data[i] = 1.0;
+		}
+		int m1,m2,m3,size;
+		myReal *data;
+		myReal operator() (int i, int j, int k) const {
+			return data[k*m1*m2 + j*m1 + i];
+		}
+		myReal& operator() (int i, int j, int k) {
+			return data[k*m1*m2 + j*m1 + i];
+		}
+};
  
 /***************************************************************************************************************
  * function to  print dual grid strucure                                                                            * 

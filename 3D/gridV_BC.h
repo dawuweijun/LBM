@@ -138,9 +138,9 @@ void periodicNode23(gridV<N> &node){
 
 template<int N>
 void periodicNode123(gridV<N> &node){
-   periodicNode1( node); 
-  periodicNode2( node);
   periodicNode3( node);
+	 periodicNode2( node);
+	 periodicNode1( node); 
 }
 
 //Now set periodic for all the 7 distributions
